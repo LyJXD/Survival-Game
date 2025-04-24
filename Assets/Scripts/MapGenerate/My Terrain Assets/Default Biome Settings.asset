@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bae7dba65fa73a249bd17f79f0dcc6d4, type: 3}
+  m_Name: Default Biome Settings
+  m_EditorClassIdentifier: 
+  autoUpdate: 0
+  biomeTypes:
+  - biomeType: "\u5E73\u539F"
+    treeSpawnChance: 50
+    stoneSpawnChance: 25
+    minHeight: 1
+    maxHeight: 10
+    minHumidity: 35
+    maxHumidity: 55
+    minTemperature: 15
+    maxTemperature: 25
+  - biomeType: "\u68EE\u6797"
+    treeSpawnChance: 75
+    stoneSpawnChance: 25
+    minHeight: 5
+    maxHeight: 15
+    minHumidity: 55
+    maxHumidity: 100
+    minTemperature: 15
+    maxTemperature: 30
+  - biomeType: "\u9AD8\u539F"
+    treeSpawnChance: 25
+    stoneSpawnChance: 50
+    minHeight: 15
+    maxHeight: 30
+    minHumidity: 15
+    maxHumidity: 35
+    minTemperature: 0
+    maxTemperature: 15
