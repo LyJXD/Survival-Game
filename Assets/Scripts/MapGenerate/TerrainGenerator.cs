@@ -37,10 +37,12 @@ public class TerrainGenerator : MonoBehaviour
     // 可能成为城镇时该地图块的平原比例
     public static float PlainRatioForTown = .75f;
     // 地图还可以生成城镇中心的数目
-    public static float TownNumRemain = 7;
+    public static float TownNumRemain = 3;
 
+    [SerializeField]
     // 距离地图中心的能生成城镇的最近坐标
     private float minCoordDstFromTownToCenter;
+    [SerializeField]
     // 可以生成城镇的最小坐标间隔
     private float minCoordDstFromTownToTown;
     private float meshWorldSize;
@@ -127,18 +129,17 @@ public class TerrainGenerator : MonoBehaviour
                     // 如果该地图块没有添加过，则新创建一个地图块并添加进字典
                     else
                     {
-                        TerrainChunk newChunk = new(viewedChunkCoord, heightMapSettings, meshSettings, biomeSettings, detailLevels, colliderLODIndex, transform, viewer, terrainMaterial, riverMaterial);
+                        TerrainChunk newChunk = new TerrainChunk(viewedChunkCoord, heightMapSettings, meshSettings, biomeSettings, detailLevels, colliderLODIndex, transform, viewer, terrainMaterial, riverMaterial);
                         terrainChunkDictionary.Add(viewedChunkCoord, newChunk);
 
                         // 判断当前地图块能否生成城镇
-                        if (viewedChunkCoord.x > minCoordDstFromTownToTown || viewedChunkCoord.y > minCoordDstFromTownToTown)
+                        if (viewedChunkCoord.x > minCoordDstFromTownToCenter || viewedChunkCoord.y > minCoordDstFromTownToCenter)
                         {
-                            if (townCenterDictionary != null && FindNearestTown(viewedChunkCoord) > minCoordDstFromTownToCenter)
+                            if (townCenterDictionary != null && FindNearestTown(viewedChunkCoord) > minCoordDstFromTownToTown)
                             {
                                 newChunk.isTown = true;
                             }
                         }
-
 
                         // 为事件添加函数 当地图块是否可见状态改变时
                         newChunk.OnVisibilityChanged += OnTerrainChunkVisbilityChanged;
@@ -154,21 +155,6 @@ public class TerrainGenerator : MonoBehaviour
                 }
             }
         }
-    }
-
-    // 判断该坐标四周是否有城镇
-    private bool IsNearTown(Vector2 currentCoord)
-    {
-        if (townCenterDictionary.ContainsKey(new Vector2(currentCoord.x, currentCoord.y + 1)) ||    // North
-            townCenterDictionary.ContainsKey(new Vector2(currentCoord.x, currentCoord.y - 1)) ||    // Sourth
-            townCenterDictionary.ContainsKey(new Vector2(currentCoord.x + 1, currentCoord.y)) ||    // West
-            townCenterDictionary.ContainsKey(new Vector2(currentCoord.x - 1, currentCoord.y)))      // East
-        {
-            return true;
-        }
-            
-        return false;
-        
     }
 
     // 寻找与当前城镇距离最近的城镇

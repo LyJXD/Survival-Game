@@ -300,7 +300,7 @@ public class MeshData
         vertices = flatShadedVertices;
     }
 
-    public Mesh CreatMesh()
+    public Mesh CreateMesh()
     {
         Mesh mesh = new()
         {

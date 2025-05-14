@@ -27,6 +27,7 @@ public class TerrainChunk
     private GameObject riverMeshObject;
     private MeshRenderer riverMeshRenderer;
     private MeshFilter riverMeshFilter;
+    private MeshCollider riverMeshCollider;
 
     // LOD信息
     private LODInfo[] detailLevels;
@@ -50,7 +51,6 @@ public class TerrainChunk
     public bool isTown = false;
 
     public TerrainChunkData terrainData; 
-    private Texture terrainTexture;
 
     public TerrainChunk(
         Vector2 coord, 
@@ -71,7 +71,6 @@ public class TerrainChunk
         this.MeshSettings = meshSettings;
         this.biomeSettings = biomeSettings;
         this.viewer = viewer;
-        terrainTexture = terrainMaterial.GetTexture("_Grass_Texture");
         terrainData = new();
 
         sampleCenter = coord * meshSettings.MeshWorldSize / meshSettings.meshScale;
@@ -96,6 +95,7 @@ public class TerrainChunk
         riverMeshObject = new GameObject("River");
         riverMeshRenderer = riverMeshObject.AddComponent<MeshRenderer>();
         riverMeshFilter = riverMeshObject.AddComponent<MeshFilter>();
+        riverMeshCollider = riverMeshObject.AddComponent<MeshCollider>();
         riverMeshRenderer.material = riverMaterial;
         // 设定网格对象的位置与父级，设定不可见
         riverMeshObject.transform.position = new Vector3(position.x, 0, position.y);
@@ -104,6 +104,7 @@ public class TerrainChunk
         SetVisible(false);
 
         meshObject.layer = LayerMask.NameToLayer("Ground");
+        riverMeshObject.layer = LayerMask.NameToLayer("Water");
 
         lodMeshes = new LODMesh[detailLevels.Length];
         for (int i = 0; i < detailLevels.Length; i++)
@@ -141,11 +142,6 @@ public class TerrainChunk
     {
         heightMapData = (HeightMap)heightMapObject;
         heightMapReceived = true;
-        terrainData.SetUp(
-            new Vector3(MeshSettings.MeshWorldSize, heightMapData.MaxValue, MeshSettings.MeshWorldSize),
-            MeshSettings.NumVerticesPerLine,
-            GenerateHeightmapTexture(heightMapData.Values),
-            terrainTexture);
 
         UpdateTerrainChunk();
     }
@@ -230,12 +226,14 @@ public class TerrainChunk
                 if (isFirstCreateChunk) //&& sqrDstFromViewerToEdge < resourceSpawnDistanceThreshold * resourceSpawnDistanceThreshold)
                 {
                     // 该地图块为初次生成 所以在此处生成该地图块的环境资源 - 树木等
-                    PoolManager.Instance.treeFactory.Spawn(this);
-                    //meshObject.AddComponent<GrassInstancerController>()._terrain = this;
-                    //PoolManager.Instance.grassFactory.Spawn(this);
                     if (isTown)
                     {
                         PoolManager.Instance.buildingFactory.Spawn(this);
+                    }
+                    else
+                    {
+                        PoolManager.Instance.treeFactory.Spawn(this);
+                        //meshObject.AddComponent<GrassInstancerController>()._terrain = this;
                     }
                     isFirstCreateChunk = false;
                 }
@@ -263,12 +261,10 @@ public class TerrainChunk
                     {
                         previousLODIndex = lodIndex;
                         meshFilter.mesh = lodMesh.terrainMesh;
+                        riverMeshFilter.mesh = lodMesh.riverMesh;
                         // meshObject.GetComponent<GPUGrassTest>().enabled = true;
-                        // meshObject.GetComponent<GPUGrassTest>()._terrianMesh = meshFilter.mesh;
-                        if (!isTown)
-                        {
-                            riverMeshFilter.mesh = lodMesh.riverMesh;
-                        }
+                        // meshObject.GetComponent<GPUGrassTest>()._terrianMesh = meshFilter.mesh;                      
+                        
                     }
                     else if (!lodMesh.hasRequestedMesh)
                     {
@@ -307,6 +303,7 @@ public class TerrainChunk
                 if (lodMeshes[colliderLODIndex].hasMesh)
                 {
                     meshCollider.sharedMesh = lodMeshes[colliderLODIndex].terrainMesh;
+                    riverMeshCollider.sharedMesh = lodMeshes[colliderLODIndex].riverMesh;
                     hasSetCollider = true;
                 }
             }
@@ -341,8 +338,8 @@ public class TerrainChunk
         private void OnMeshDataReceived(object meshDataObject)
         {
             (MeshData mesh1, MeshData mesh2) = ((MeshData,MeshData))meshDataObject;
-            terrainMesh = mesh1.CreatMesh();
-            riverMesh = mesh2.CreatMesh();
+            terrainMesh = mesh1.CreateMesh();
+            riverMesh = mesh2.CreateMesh();
 
             hasMesh = true;
 
