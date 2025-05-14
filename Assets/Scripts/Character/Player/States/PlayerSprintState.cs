@@ -4,16 +4,13 @@ using UnityEngine;
 
 public class PlayerSprintState : PlayerState
 {
-
+    // 状态判断Booleans
     bool grounded;
     bool sprint;
     bool sprintJump;
 
     float gravityValue;
     float playerSpeed;
-    Vector3 currentVelocity;
-    Vector3 cVelocity;
-
 
     public override void Enter()
     {
@@ -24,7 +21,6 @@ public class PlayerSprintState : PlayerState
 
         input = Vector2.zero;
         velocity = Vector3.zero;
-        currentVelocity = Vector3.zero;
         gravityVelocity.y = 0;
 
         playerSpeed = player.sprintSpeed;
@@ -55,7 +51,6 @@ public class PlayerSprintState : PlayerState
         if (jumpAction.triggered)
         {
             sprintJump = true;
-
         }
     }
 
@@ -67,7 +62,7 @@ public class PlayerSprintState : PlayerState
         if (sprint)
         {
             // 设定动画参数
-            animator.SetFloat("Speed", input.magnitude + 0.5f, player.speedDampTime, Time.deltaTime);
+            animator.SetFloat("Speed", input.magnitude + 0.5f);
         }
         else
         {
@@ -89,15 +84,9 @@ public class PlayerSprintState : PlayerState
         {
             gravityVelocity.y = 0f;
         }
-        currentVelocity = Vector3.SmoothDamp(currentVelocity, velocity, ref cVelocity, player.velocityDampTime);
 
         // 执行玩家移动
-        player.characterController.Move(currentVelocity * Time.deltaTime * playerSpeed + gravityVelocity * Time.deltaTime);
-
-        if (velocity.sqrMagnitude > 0)
-        {
-            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, Quaternion.LookRotation(velocity), player.rotationDampTime);
-        }
+        player.characterController.Move(velocity * Time.deltaTime * playerSpeed + gravityVelocity * Time.deltaTime);
     }
 
     public override void Exit()

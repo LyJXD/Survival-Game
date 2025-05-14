@@ -7,7 +7,7 @@ using UnityEngine.PlayerLoop;
 /// Base class for all stats: health, armor, damage etc 
 /// </summary>
 [System.Serializable]
-public class Status
+public class Stats
 {
     public int baseValue;
     [SerializeField]

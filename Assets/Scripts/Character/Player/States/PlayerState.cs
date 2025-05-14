@@ -11,7 +11,7 @@ public abstract class PlayerState :State
     #region ActionMap
     protected InputAction moveAction;
     protected InputAction jumpAction;
-    protected InputAction sprintAction; 
+    protected InputAction sprintAction;
     #endregion
     
     protected Vector2 input;

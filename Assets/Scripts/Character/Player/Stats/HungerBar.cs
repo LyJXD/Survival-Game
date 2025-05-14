@@ -21,8 +21,8 @@ public class HungerBar : MonoBehaviour
 
     private void Update()
     {
-        currentHunger = playerStatus.GetComponent<PlayerStatus>().currentHunger;
-        maxHunger = playerStatus.GetComponent<PlayerStatus>().maxHunger.GetValue();
+        currentHunger = playerStatus.GetComponent<PlayerStats>().currentHunger;
+        maxHunger = playerStatus.GetComponent<PlayerStats>().maxHunger.GetValue();
 
         float fillValue = currentHunger / maxHunger;
         Slider.value = fillValue;

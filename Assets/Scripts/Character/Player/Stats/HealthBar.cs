@@ -21,8 +21,8 @@ public class HealthBar : MonoBehaviour
 
     private void Update()
     {
-        currentHealth = playerStatus.GetComponent<PlayerStatus>().CurrentHealth;
-        maxHealth = playerStatus.GetComponent<PlayerStatus>().maxHealth.GetValue();
+        currentHealth = playerStatus.GetComponent<PlayerStats>().CurrentHealth;
+        maxHealth = playerStatus.GetComponent<PlayerStats>().maxHealth.GetValue();
 
         float fillValue = currentHealth / maxHealth;
         slider.value = fillValue;

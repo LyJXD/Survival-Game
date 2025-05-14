@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class PlayerJumpState : PlayerState
 {
+    // ×´Ì¬ÅÐ¶ÏBoolean
     bool grounded;
 
     float gravityValue;

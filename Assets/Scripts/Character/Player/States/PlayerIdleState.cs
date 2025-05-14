@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class PlayerIdleState : PlayerState
 {
-    float gravityValue;
-    bool jump;
-    Vector3 currentVelocity;
+    // ×´Ì¬ÅÐ¶ÏBooleans
     bool grounded;
     bool sprint;
-    float playerSpeed;
+    bool jump;
 
+    float playerSpeed;
+    float gravityValue;
+
+    Vector3 currentVelocity; 
     Vector3 cVelocity;
 
     public override void Enter()
@@ -19,9 +22,7 @@ public class PlayerIdleState : PlayerState
 
         jump = false;
         sprint = false;
-        input = Vector2.zero;
 
-        currentVelocity = Vector3.zero;
         gravityVelocity.y = 0;
 
         velocity = player.playerVelocity;
@@ -84,12 +85,8 @@ public class PlayerIdleState : PlayerState
 
         // Ö´ÐÐÍæ¼ÒÒÆ¶¯
         player.characterController.Move(currentVelocity * Time.deltaTime * playerSpeed + gravityVelocity * Time.deltaTime);
-
-        if (velocity.sqrMagnitude > 0)
-        {
-            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, Quaternion.LookRotation(velocity), player.rotationDampTime);
-        }
     }
+
     public override void Exit()
     {
         base.Exit();

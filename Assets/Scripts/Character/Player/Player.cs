@@ -6,20 +6,25 @@ using UnityEngine.InputSystem;
 public class Player : Character
 {
     [Header("Controls")]
+    public new PlayerStats Stats;
     public float playerSpeed = 5.0f;
     public float sprintSpeed = 7.0f;
     public float jumpHeight = 0.8f;
     public float gravityMultiplier = 2;
     public float rotationSpeed = 5f;
-    public GameObject ToolHolder;
+    public GameObject WeaponHolder;
+
+    [Header("Attack Info")]
+    public int comboCounter;
+    public float comboWindow = 2f;  // 连击窗口，攻击间隔不超过该时间则计算连击
+    private float lastTimeAttacked;
+    protected InputAction attackAction;
 
     [Header("Animation Smoothing")]
     [Range(0, 1)]
     public float speedDampTime = 0.1f;
     [Range(0, 1)]
     public float velocityDampTime = 0.9f;
-    [Range(0, 1)]
-    public float rotationDampTime = 0.2f;
     [Range(0, 1)]
     public float airControl = 0.5f;
 
@@ -56,6 +61,7 @@ public class Player : Character
     {
         characterController = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
+        attackAction = playerInput.actions["Attack"];
 
         playerStateMachine = new StateMachine();
         idleState.Setup(Animator, this, playerStateMachine);
@@ -79,7 +85,7 @@ public class Player : Character
         playerStateMachine.currentState.LogicUpdate();
 
         // 玩家按下左键攻击
-        if(Mouse.current.leftButton.wasPressedThisFrame)
+        if (attackAction.triggered && WeaponHolder.transform.childCount != 0)
         {
             Attack();
         }
@@ -93,24 +99,27 @@ public class Player : Character
     #region Collision Checks
     private void GroundCheck() => isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
     private void ObjectCheck() => isObjectCanInteract = Physics.CheckSphere(objectCheck.position, accessRange);
-    private int DistanceToSelectedObject()
-    {
-        return 0;
-    }
     #endregion
 
     #region Player Arm Movement
     public override void Attack()
     {
-        // 执行攻击动画
-
-        // 检测到生物/树/矿物 并且手上是工具 在工具使用范围内 就可以对生物/树/矿物造成伤害 - 攻击/砍树/采矿
-        if (DistanceToSelectedObject() < attackCheckRadius && ToolHolder.GetComponentInChildren<ToolItem>())
+        if (comboCounter > 1 || Time.time >= lastTimeAttacked + comboWindow)
         {
-            Status.DoDamage(SelectionManager.Instance.SelectedObjectStatus);
+            comboCounter = 0;
         }
+
+        // 执行攻击动画
+        Animator.SetTrigger("Attack");
+        Animator.SetInteger("ComboCounter", comboCounter);
     }
     #endregion
 
+    public void AttackFinishTrigger()
+    {
+        comboCounter++;
+        lastTimeAttacked = Time.time;
+        WeaponHolder.GetComponentInChildren<Collider>().enabled = false;
+    }
 }
 

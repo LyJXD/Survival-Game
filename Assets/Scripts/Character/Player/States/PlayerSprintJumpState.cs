@@ -8,12 +8,10 @@ public class PlayerSprintJumpState : PlayerState
     float timePassed;
     float jumpTime;
 
-
     public override void Enter()
     {
         base.Enter();
 
-        animator.applyRootMotion = true;
         timePassed = 0f;
         animator.SetTrigger("SprintJump");
 

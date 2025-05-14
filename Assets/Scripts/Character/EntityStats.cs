@@ -4,12 +4,12 @@ using UnityEngine;
 /// <summary>
 /// 所有实体 - 玩家 敌对生物 NPC 树 矿物 等 - Status
 /// </summary>
-public class EntityStatus : MonoBehaviour
+public class EntityStats : MonoBehaviour
 {
-    #region Status
-    public Status maxHealth;            // 生命值
-    public Status attack;               // 攻击力
-    public Status defense;              // 防御力
+    #region Stats
+    public Stats maxHealth;            // 生命值
+    public Stats attack;               // 攻击力
+    public Stats defense;              // 防御力
     #endregion
 
     public int CurrentHealth { get; protected set; }
@@ -30,7 +30,7 @@ public class EntityStatus : MonoBehaviour
     /// <summary>
     /// 对目标造成伤害
     /// </summary>
-    public virtual void DoDamage(EntityStatus targetStatus)
+    public virtual void DoDamage(EntityStats targetStatus)
     {
         // 计算最终伤害并确保伤害值不会低于0
         int totalDamage = attack.GetValue() - targetStatus.defense.GetValue();

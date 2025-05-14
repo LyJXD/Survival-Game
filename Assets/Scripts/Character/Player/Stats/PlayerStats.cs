@@ -3,30 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStatus : EntityStatus
+public class PlayerStats : EntityStats
 {
-    #region Status
-    public Status agililty;             // 敏捷度
-    public Status criticalRate;         // 暴击率
-    public Status criticalDamage;       // 暴击伤害
-    public Status maxHunger;            // 最大饱食度
-    public Status attackToTree;           // 对树的攻击力 - 初始为0 有工具或者其他装备将增加该数值
-    public Status attackToMineral;        // 对矿物的攻击力 - 初始为0 有工具或者其他装备将增加该数值
+    #region Stats
+    public Stats maxHunger;            // 最大饱食度
+    public Stats dropRate;             // 掉宝率
+    public Stats criticalRate;         // 暴击率
+    public Stats criticalDamage;       // 暴击伤害
+    public Stats attackToTree;         // 对树的攻击力 - 初始为0 有工具或者其他装备将增加该数值
+    public Stats attackToMineral;      // 对矿物的攻击力 - 初始为0 有工具或者其他装备将增加该数值
     #endregion
 
     public int currentHunger;
     private float distanceTravelled = 0f;
     private Vector3 lastPosition;
 
-    public GameObject Player;
+    public Player player;
+
+    public event Action OnPlayerStatsChanged;
 
     public override void Start()
     {
         base.Start();
 
+        player = PlayerManager.Instance.Player;
+
         currentHunger = maxHunger.GetValue();
 
         EquipmentManager.Instance.OnEquipmentChanged += ChangeEquipment;
+        EquipmentManager.Instance.OnToolChanged += ChangeTool;
     }
 
     private void Update()
@@ -34,9 +39,10 @@ public class PlayerStatus : EntityStatus
         HandleHunger();
     }
 
-    public override void DoDamage(EntityStatus targetStatus)
+    public override void DoDamage(EntityStats targetStatus)
     {
         int totalDamage = 0;
+
         if (SelectionManager.Instance.IsCharacterSelected)
         {
             totalDamage = attack.GetValue() - targetStatus.defense.GetValue();
@@ -54,7 +60,7 @@ public class PlayerStatus : EntityStatus
         targetStatus.TakeDamage(totalDamage);
     }
 
-    private void ChangeTool(ToolItemData newItem, ToolItemData oldItem)
+    private void ChangeTool(WeaponItemData newItem, WeaponItemData oldItem)
     {
         if (newItem != null)
         {
@@ -69,6 +75,8 @@ public class PlayerStatus : EntityStatus
             attackToTree.RemoveModifier(oldItem.treeAttack);
             attackToMineral.RemoveModifier(oldItem.mineralAttack);
         }
+
+        OnPlayerStatsChanged?.Invoke();
     }
 
     private void ChangeEquipment(EquipmentItemData newItem, EquipmentItemData oldItem)
@@ -78,7 +86,7 @@ public class PlayerStatus : EntityStatus
             maxHealth.AddModifier(newItem.health);
             attack.AddModifier(newItem.attack);
             defense.AddModifier(newItem.defense);
-            agililty.AddModifier(newItem.agililty);
+            dropRate.AddModifier(newItem.dropRate);
             criticalRate.AddModifier(newItem.criticalRate);
             criticalDamage.AddModifier(newItem.criticalDamage);
         }
@@ -88,17 +96,19 @@ public class PlayerStatus : EntityStatus
             maxHealth.RemoveModifier(oldItem.health);
             attack.RemoveModifier(oldItem.attack);
             defense.RemoveModifier(oldItem.defense);
-            agililty.RemoveModifier(oldItem.agililty);
+            dropRate.RemoveModifier(oldItem.dropRate);
             criticalRate.RemoveModifier(oldItem.criticalRate);
             criticalDamage.RemoveModifier(oldItem.criticalDamage);
         }
+
+        OnPlayerStatsChanged?.Invoke();
     }
 
     #region Health & Hunger
     private void HandleHunger()
     {
-        distanceTravelled += Vector3.Distance(Player.transform.position, lastPosition);
-        lastPosition = Player.transform.position;
+        distanceTravelled += Vector3.Distance(PlayerManager.Instance.Player.transform.position, lastPosition);
+        lastPosition = PlayerManager.Instance.Player.transform.position;
 
         if (distanceTravelled >= 25)
         {
