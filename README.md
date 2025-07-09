@@ -1,5 +1,5 @@
 # Survival-Game
-Graduation Project of Making a Survival Game
+Graduation Project of Developing a Survival Game
 
 ### Game Preview
 
